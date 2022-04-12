@@ -55,7 +55,7 @@ def verifica(app):
 
     #mostra a imagem usada para a verificação
     while True:
-        cv2.imshow('Imagem', gray_img)
+        cv2.imshow('Imagem', img)
         if confidence > 80:
             sg.popup_ok('Acesso autorizado')
             cv2.destroyAllWindows()
