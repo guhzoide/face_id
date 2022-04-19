@@ -1,7 +1,9 @@
 import PySimpleGUI as sg
 import cv2
 import os
+import numpy as np
 from menu import main
+from removebg import RemoveBg as rmbg
 
 def cadastraRosto():
     sg.theme('DarkBlack')
@@ -35,11 +37,14 @@ def cadastraRosto():
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Pega as coordenadas da localização do rosto na imagem
-        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=3, minSize=(50, 50))                                  
+        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25))                                  
 
         # Desenha um retangulo nas coordenadas oferecidas
         for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2) 
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+            contador = str(faces.shape[0])
+            if contador > '1':
+                sg.popup_auto_close('Mais de um rosto detectado')
 
         # Mostra a imagem
         cv2.imshow("Verificando face, aguarde...", img) 
@@ -53,8 +58,8 @@ def cadastraRosto():
 
     #salva o cadastro
     imgName = "banco/" + nome + ".jpg"
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite(imgName, gray_img)    
+    Img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite(imgName, img)    
 
     # fecha todas as janelas
     cv2.destroyAllWindows()

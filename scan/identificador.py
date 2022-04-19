@@ -1,5 +1,6 @@
 import os
 import cv2
+import numpy as np
 import PySimpleGUI as sg
 from menu import main
 from facepplib import FacePP, exceptions
@@ -54,9 +55,14 @@ def verifica(app):
     confidence = cmp_.confidence
 
     #mostra a imagem usada para a verificação
+    faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
     while True:
-        cv2.imshow('Imagem', img)
-        if confidence > 80:
+        cv2.imshow('Imagem', gray_img)
+        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25)) 
+        contador = str(faces.shape[0])
+        if contador > '1':
+            sg.popup_auto_close('Mais de um rosto detectado')
+        elif confidence > 80:
             sg.popup_ok('Acesso autorizado')
             cv2.destroyAllWindows()
             break
@@ -64,7 +70,6 @@ def verifica(app):
             sg.popup_ok('Acesso negado')
             cv2.destroyAllWindows()
             break
-    
     verifica(app_)
 
 if __name__ == '__main__':
