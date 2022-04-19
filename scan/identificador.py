@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import PySimpleGUI as sg
 from menu import main
-from facepplib import FacePP, exceptions
 
 #parametros para a verificação do rosto
 face_detection=""
