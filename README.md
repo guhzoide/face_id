@@ -14,5 +14,6 @@
 		Implementado a biblioteca 'facepplib' e a verificação/liberação.
 	
 	Atualização = 19/04/2022:
-		Adcionado o tratamento de multiplas faces impedindo de realizar a verificação/liberação caso ouver mais de uma. 
+		Adcionado o tratamento de multiplas faces impedindo de realizar a verificação/liberação 
+		caso ouver mais de uma. 
 #------------------------------------------------------------------------------------------------------------------------------#
