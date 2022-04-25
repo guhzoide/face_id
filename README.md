@@ -8,7 +8,7 @@
 	Projeto da faculdade - ainda em desenvolvimento.
 	
 	Atualização = 22/03/2022:
-		Identificação de face atravez de um frame utilizando o OpenCV.
+		Identificação de face atravez de uma camera utilizando o OpenCV.
 	
 	Atualização = 08/04/2022:
 		Implementado a biblioteca 'facepplib' e a verificação/liberação.
