@@ -18,10 +18,10 @@ def main():
 
     elif e == 'Indentificar':
         window.close()
-        ident = 'python3 scan/identificador.py'
+        ident = 'python scan/identificador.py'
         os.system(ident)
 
     elif e == 'Cadastrar':
         window.close()
-        cad = 'python3 scan/cadastrar.py'
+        cad = 'python scan/cadastrar.py'
         os.system(cad)

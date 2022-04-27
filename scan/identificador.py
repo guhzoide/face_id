@@ -1,8 +1,9 @@
 import os
 import cv2
-import numpy as np
+import imutils
 import PySimpleGUI as sg
 from menu import main
+from facepplib import FacePP, exceptions
 
 #parametros para a verificação do rosto
 face_detection=""
@@ -12,6 +13,7 @@ face_landmarks=""
 dense_facial_landmarks=""
 face_attributes=""
 beauty_score_and_emotion_recognition=""
+faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
 
 def verifica(app):
 
@@ -38,30 +40,39 @@ def verifica(app):
 
     elif e == 'Ok':
         window.close()
-    
-    #captura um frame da imagem apartir de uma camera
+
+    # transforma a imagem capturada em cinza 
     webcam = cv2.VideoCapture(0)
     _, img = webcam.read()
+    cv2.imwrite('verifica/verifica.jpg', img) 
 
-    # Pega a versão cinza da imagem
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite('verifica/verifica.jpg', gray_img) 
-
-    #asmazena as imagens em um variavel e as compara
+    #armazena as imagens em uma variavel e as compara
     img1 = "banco/" + nome + ".jpg"
     img2 = "verifica/verifica.jpg"
     cmp_ = app.compare.get(image_file1=img1,image_file2=img2)
     confidence = cmp_.confidence
-
-    #mostra a imagem usada para a verificação
+    
     faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
     while True:
-        cv2.imshow('Imagem', gray_img)
-        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25)) 
-        contador = str(faces.shape[0])
-        if contador > '1':
-            sg.popup_auto_close('Mais de um rosto detectado')
-        elif confidence > 80:
+        # Captura o frame
+        img = cv2.imread(img2)
+        img = imutils.resize(img, width=950)
+            
+        # Pega a versão cinza da imagem
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Pega as coordenadas da localização do rosto na imagem
+        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25))                                  
+
+        # Desenha um retangulo nas coordenadas oferecidas
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+            contador = str(faces.shape[0])
+            if contador > '1':
+                sg.popup_auto_close('Mais de um rosto detectado')
+        
+        cv2.imshow("Face verificada", gray_img)
+        if confidence > 80:
             sg.popup_ok('Acesso autorizado')
             cv2.destroyAllWindows()
             break
