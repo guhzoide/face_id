@@ -1,8 +1,14 @@
-import PySimpleGUI as sg
-import cv2
 import os
+import cv2
 import imutils
+import pysftp as sf
 from menu import main
+import PySimpleGUI as sg
+
+#servidor
+address = '192.168.5.102'
+username = 'face'
+password = 'faceid'
 
 def cadastraRosto():
     sg.theme('DarkBlack')
@@ -22,46 +28,42 @@ def cadastraRosto():
     elif e == 'Ok':
         window.close()
 
-    # Inicializa identificador 
     faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
 
-    #Inicializa a camera
     webcam = cv2.VideoCapture(0)
 
     while True:
-        # Captura o frame
         _, img = webcam.read()
 
-        # Pega a versão cinza da imagem
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
-
-        # Pega as coordenadas da localização do rosto na imagem
         faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25))                                  
 
-        # Desenha um retangulo nas coordenadas oferecidas
         for (x, y, w, h) in faces:
             cv2.rectangle(gray_img, (x, y), (x + w, y + h), (255, 255, 0), 2)
             contador = str(faces.shape[0])
             if contador > '1':
                 sg.popup_auto_close('Mais de um rosto detectado')
-        # Mostra a imagem
+
         img = imutils.resize(gray_img, width=850)
         cv2.imshow("Verificando face, aguardando retorno...", gray_img) 
 
-        # Espera o usuario pressionar q
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Fecha a camera
     webcam.release()
-
-    #salva o cadastro
+    
     imgName = "banco/" + nome + ".jpg"
-    cv2.imwrite(imgName, gray_img)    
+    cv2.imwrite(imgName, gray_img)
+    sg.popup_auto_close('Cadastro realizado com sucesso')
+    img = imgName
+    try:
+        with sf.Connection(address, username=username, password=password) as sftp:
+            with sftp.cd('/home/face/face_id/banco'):             
+                sftp.put(img)    
+    except:
+        sg.popup_auto_close('Falha na conexão com o servidor')   
 
-    # fecha todas as janelas
     cv2.destroyAllWindows()
-    sg.popup_auto_close('Cadastro realizada com sucesso')
     main()
 cadastraRosto()

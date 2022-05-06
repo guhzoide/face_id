@@ -1,8 +1,11 @@
+from email.headerregistry import Address
 import os
 import cv2
 import imutils
-import PySimpleGUI as sg
+import pysftp as sf
 from menu import main
+import PySimpleGUI as sg
+from datetime import datetime
 from facepplib import FacePP, exceptions
 
 #parametros para a verificação do rosto
@@ -15,9 +18,12 @@ face_attributes=""
 beauty_score_and_emotion_recognition=""
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
 
-def verifica(app):
+#servidor
+address = '192.168.5.102'
+username = 'face'
+password = 'faceid'
 
-    #tela
+def verifica(app):
     sg.theme('DarkBlack')
     dados = [
         [sg.Text('Digite seu nome'), sg.Input(key='nome')],
@@ -41,37 +47,38 @@ def verifica(app):
     elif e == 'Ok':
         window.close()
 
-    # transforma a imagem capturada em cinza 
     webcam = cv2.VideoCapture(0)
     _, img = webcam.read()
-    cv2.imwrite('verifica/verifica.jpg', img) 
+    verifica = str(datetime.now())
+    cv2.imwrite('verifica/'+ verifica +'.jpg', img) 
 
-    #armazena as imagens em uma variavel e as compara
     img1 = "banco/" + nome + ".jpg"
-    img2 = "verifica/verifica.jpg"
+    img2 = "verifica/"+ verifica +".jpg"
     cmp_ = app.compare.get(image_file1=img1,image_file2=img2)
     confidence = cmp_.confidence
-    
+    try:
+        with sf.Connection(address, username=username, password=password) as sftp:
+            with sftp.cd('/home/face/face_id/tentativa'):             
+                sftp.put(img2)
+    except:
+        sg.popup_ok('Falha na conexão com o servidor')
+
     faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
     while True:
-        # Captura o frame
         img = cv2.imread(img2)
         img = imutils.resize(img, width=950)
             
-        # Pega a versão cinza da imagem
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # Pega as coordenadas da localização do rosto na imagem
         faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25))                                  
 
-        # Desenha um retangulo nas coordenadas oferecidas
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
             contador = str(faces.shape[0])
             if contador > '1':
                 sg.popup_auto_close('Mais de um rosto detectado')
         
-        cv2.imshow("Face verificada", gray_img)
+        cv2.imshow("Face verificada", img)
         if confidence > 80:
             sg.popup_ok('Acesso autorizado')
             cv2.destroyAllWindows()
@@ -80,7 +87,7 @@ def verifica(app):
             sg.popup_ok('Acesso negado')
             cv2.destroyAllWindows()
             break
-    verifica(app_)
+    main()
 
 if __name__ == '__main__':
 
@@ -105,5 +112,4 @@ if __name__ == '__main__':
         sg.popup_ok('Erro')
         verifica(app_)
 
-    # fecha todas as janelas
     cv2.destroyAllWindows() 

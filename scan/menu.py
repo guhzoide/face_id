@@ -1,13 +1,13 @@
-import PySimpleGUI as sg
 import os
+import PySimpleGUI as sg
 
 def main():
     sg.theme('DarkBlack')
     menu = [
         [sg.Text('Bem-vindo(a)')],
-        [[sg.Image("banco/logo.jpg")]],
+        [[sg.Image("logo.jpg")]],
         [sg.Text('O que deseja fazer')],
-        [sg.Button('Indentificar', size=(15,0)), sg.Button('Cadastrar', size=(15,0))]
+        [sg.Button('Indentificar', size=(15,0)), sg.Button('Cadastrar', size=(15,0)), sg.Button('Atualizar banco', size=(15,0))]
     ]
 
     window = sg.Window('Menu', menu, element_justification='c', size=(650,350))
@@ -18,10 +18,15 @@ def main():
 
     elif e == 'Indentificar':
         window.close()
-        ident = 'python scan/identificador.py'
+        ident = 'python3 scan/identificador.py'
         os.system(ident)
 
     elif e == 'Cadastrar':
         window.close()
-        cad = 'python scan/cadastrar.py'
+        cad = 'python3 scan/cadastrar.py'
         os.system(cad)
+
+    elif e == 'Atualizar banco':
+        window.close()
+        atu = 'python3 scan/atualiza_banco.py'
+        os.system(atu)
