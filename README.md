@@ -18,5 +18,5 @@
 		caso ouver mais de uma. 
 
 	Atualização = 06/05/2022:
-		conexão com servidor para salvar as imagens de cadastros e tentativas de acesso.
+		Conexão com servidor para salvar as imagens de cadastros e tentativas de acesso.
 #------------------------------------------------------------------------------------------------------------------------------#
