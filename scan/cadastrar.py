@@ -6,7 +6,7 @@ from menu import main
 import PySimpleGUI as sg
 
 #servidor
-address = '192.168.5.102'
+address = 'ip'
 username = 'face'
 password = 'faceid'
 
