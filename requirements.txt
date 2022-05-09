@@ -1,0 +1,4 @@
+opencv-python>=1.22.3
+python-facepp>=2.25.1
+PySimpleGUI>=4.59.0
+pysftp>=3.4.8
