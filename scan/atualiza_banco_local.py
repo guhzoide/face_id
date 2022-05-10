@@ -4,9 +4,9 @@ import PySimpleGUI as sg
 from menu import main
 
 #servidor
-address = '192.168.5.102'
-username = 'face'
-password = 'faceid'
+address = 'ip'
+username = 'user'
+password = 'pass'
 
 sg.theme('DarkBlack')
 try:    
