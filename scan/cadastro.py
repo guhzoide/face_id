@@ -6,9 +6,9 @@ from menu import main
 import PySimpleGUI as sg
 
 #servidor
-address = '192.168.5.102'
-username = 'face'
-password = 'faceid'
+address = 'ip'
+username = 'user'
+password = 'pass'
 
 def cadastraRosto():
     sg.theme('DarkBlack')
