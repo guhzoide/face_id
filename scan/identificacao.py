@@ -18,9 +18,9 @@ beauty_score_and_emotion_recognition=""
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
 
 #servidor
-address = '192.168.5.102'
-username = 'face'
-password = 'faceid'
+address = 'ip'
+username = 'user'
+password = 'pass'
 
 def verifica(app):
     sg.theme('DarkBlack')
