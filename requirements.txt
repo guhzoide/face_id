@@ -2,3 +2,4 @@ opencv-python
 python-facepp
 PySimpleGUI
 pysftp
+imutils
