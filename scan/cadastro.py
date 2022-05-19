@@ -1,20 +1,18 @@
 import os
 import cv2
+import base64
 import imutils
 import pysftp as sf
 from menu import main
+import psycopg2 as PgSQL
 import PySimpleGUI as sg
-
-#servidor
-address = 'ip'
-username = 'user'
-password = 'pass'
+import PIL.Image as Image
 
 def cadastraRosto():
     sg.theme('DarkBlack')
     dados = [
         [sg.Text('Digite seu nome'), sg.Input(key='nome')],
-        [sg.Button('Excluir'), sg.Button('Seguir')]
+        [sg.Button('Seguir')]
     ]
 
     window = sg.Window('Menu', dados, element_justification='c')
@@ -24,22 +22,6 @@ def cadastraRosto():
         window.close()
         main()
         os._exit(0)
-    
-    elif e == 'Excluir':
-        try:
-            window.close()
-            cad = 'banco/'+ nome +'.jpg'
-            os.remove(cad)
-            with sf.Connection(address, username=username, password=password) as sftp:
-                with sftp.cd('/home/face/face_id/banco'):
-                    sftp.remove(nome)
-            sg.popup_ok('Cadastro removido')
-            main()
-            os._exit(0)
-        except:
-            sg.popup_ok('Cadastro não localizado')
-            cadastraRosto()
-            os._exit(0)
 
     elif e == 'Seguir':
         window.close()
@@ -72,13 +54,19 @@ def cadastraRosto():
     imgName = "banco/" + nome + ".jpg"
     cv2.imwrite(imgName, gray_img)
     sg.popup_auto_close('Cadastro realizado com sucesso')
-    img = imgName
-    try:
-        with sf.Connection(address, username=username, password=password) as sftp:
-            with sftp.cd('/home/face/face_id/banco'):             
-                sftp.put(img)    
-    except:
-        sg.popup_auto_close('Falha na conexão com o servidor')   
 
+    image = open("banco/"+ nome +".jpg", "rb")
+    img = image.read()
+    img_byte = bytearray(img)
+    img_code = base64.b64encode(img_byte)
+    con = PgSQL.connect(host='localhost',
+                        database='postgres',
+                        user='postgres',
+                        password='faceid1234')
+    cursor = con.cursor()
+    cursor.execute('INSERT INTO usuarios (nome, imagem_rosto) VALUES (%s,%s);', (nome, img_code))
+    con.commit()   
+     
     cv2.destroyAllWindows()
     main()
+cadastraRosto()

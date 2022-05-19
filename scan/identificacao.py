@@ -1,9 +1,9 @@
 import os
 import cv2
 import imutils
-import pysftp as sf
 from menu import main
 import PySimpleGUI as sg
+import psycopg2 as PgSQL
 from datetime import datetime
 from facepplib import FacePP, exceptions
 
@@ -16,11 +16,6 @@ dense_facial_landmarks=""
 face_attributes=""
 beauty_score_and_emotion_recognition=""
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
-
-#servidor
-address = 'ip'
-username = 'user'
-password = 'pass'
 
 def verifica(app):
     sg.theme('DarkBlack')
@@ -47,7 +42,6 @@ def verifica(app):
     elif e == 'Ok':
         window.close()
 
- #----------------------------------------------------------------------------------------------------------------#
     try:
         img1 = "banco/" + nome + ".jpg"
         test = open(img1)
@@ -55,23 +49,35 @@ def verifica(app):
         webcam = cv2.VideoCapture(0)
         _, img = webcam.read()
         verifica = str(datetime.now())
+        data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cv2.imwrite('verifica/'+ verifica +'.jpg', img) 
 
         img2 = "verifica/"+ verifica +".jpg"
         cmp_ = app.compare.get(image_file1=img1,image_file2=img2)
         confidence = cmp_.confidence
 
-        with sf.Connection(address, username=username, password=password) as sftp:
-            with sftp.cd('/home/face/face_id/tentativa'):             
-                sftp.put(img2)
+        if confidence > 80:
+            result = True
+            
+        else:
+            result = False
 
+        con = PgSQL.connect(host='localhost',
+                            database='postgres',
+                            user='postgres',
+                            password='faceid1234')
+        cursor = con.cursor()
+        cursor.execute('INSERT INTO acessos (colaborador_nome, data, acesso_autorizado) VALUES (%s,%s,%s);', (nome, data, result))
+        con.commit()
+        
     except cv2.error:
         sg.popup_ok('Verifique a conexão com a câmera')
         main()
         os._exit(0)    
 
-    except Exception:
-        sg.popup_ok('Falha na conexão com o servidor')
+    except (Exception, PgSQL.DatabaseError) as error:
+        sg.popup_ok('Falha ao conectar com banco')
+        os._exit(0)
     
     faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
     while True:
@@ -120,7 +126,7 @@ if __name__ == '__main__':
         verifica(app_)
 
     except exceptions.BaseFacePPError as e:
-        sg.popup_ok('Erro')
+        sg.popup_ok('Erro ao realizar identificação')
         verifica(app_)
         os._exit(0)
 
