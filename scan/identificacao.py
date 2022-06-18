@@ -1,6 +1,7 @@
 import os
 import cv2
 import imutils
+import pysftp as sf
 from menu import main
 import PySimpleGUI as sg
 import psycopg2 as PgSQL
@@ -16,6 +17,18 @@ dense_facial_landmarks=""
 face_attributes=""
 beauty_score_and_emotion_recognition=""
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
+data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+#servidor
+address = '192.168.5.107'
+username = 'root'
+password = 'faceid123'
+
+#banco
+host='localhost'
+database='postgres'
+user='postgres'
+password='admin'
 
 def verifica(app):
     sg.theme('DarkBlack')
@@ -43,16 +56,23 @@ def verifica(app):
         window.close()
 
     try:
+        remotepath = nome + '.jpg'
+        localpath = 'banco/' + nome + '.jpg'
+        with sf.Connection(address, username=username, password=password) as sftp:
+            with sftp.cd('/home/face/face_id/cadastro'):
+                sftp.get(remotepath, localpath)
+
         img1 = "banco/" + nome + ".jpg"
         test = open(img1)
         test.close()
+
         webcam = cv2.VideoCapture(0)
         _, img = webcam.read()
-        verifica = str(datetime.now())
-        data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        cv2.imwrite('verifica/'+ verifica +'.jpg', img) 
+        
+        local = 'verifica'
+        cv2.imwrite('verifica/' + local + '.jpg', img)
 
-        img2 = "verifica/"+ verifica +".jpg"
+        img2 = "verifica/"+ local +".jpg"
         cmp_ = app.compare.get(image_file1=img1,image_file2=img2)
         confidence = cmp_.confidence
 
@@ -62,24 +82,44 @@ def verifica(app):
         else:
             result = False
 
-        con = PgSQL.connect(host='localhost',
-                            database='postgres',
-                            user='postgres',
-                            password='faceid1234')
+        con = PgSQL.connect(host=host,
+                            database=database,
+                            user=user,
+                            password=password)
         cursor = con.cursor()
         cursor.execute('INSERT INTO acessos (colaborador_nome, data, acesso_autorizado) VALUES (%s,%s,%s);', (nome, data, result))
         con.commit()
-        
-    except cv2.error:
-        sg.popup_ok('Verifique a conexão com a câmera')
-        main()
-        os._exit(0)    
 
-    except (Exception, PgSQL.DatabaseError) as error:
-        sg.popup_ok('Falha ao conectar com banco')
-        os._exit(0)
-    
-    faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
+        with sf.Connection(address, username=username, password=password) as sftp:
+            with sftp.cd('/home/face/face_id/tentativas'):             
+                sftp.put('verifica/' + local + '.jpg')
+
+        os.remove(img1)
+
+    except FileNotFoundError as error:
+        result = False
+        error = str(error)
+        con = PgSQL.connect(host=host,
+                            database=database,
+                            user=user,
+                            password=password)
+        cursor = con.cursor()
+        cursor.execute('INSERT INTO acessos (colaborador_nome, data, acesso_autorizado) VALUES (%s,%s,%s);', (nome, data, result))
+        con.commit()
+        with open('log/log.dat', 'a') as file:
+            file.write(data + '\n' + error + '\n\n------------------------------------------------------------------------\n\n')
+        sg.popup_ok('Cadastro não encontrado')
+        main()
+        os._exit(0) 
+
+    #except Exception as error:
+    #    sg.popup_ok('Algo deu errado, verifique o log')
+    #    error = str(error)
+    #    with open('log/log.dat', 'a') as file:
+    #        file.write(data + '\n' + error + '\n\n------------------------------------------------------------------------\n\n')
+    #    main()
+    #    os._exit(0)
+
     while True:
         img = cv2.imread(img2)
         img = imutils.resize(img, width=950)

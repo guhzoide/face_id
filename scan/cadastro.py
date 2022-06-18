@@ -1,12 +1,18 @@
 import os
 import cv2
-import base64
 import imutils
 import pysftp as sf
 from menu import main
-import psycopg2 as PgSQL
 import PySimpleGUI as sg
-import PIL.Image as Image
+from datetime import datetime
+
+#servidor
+address = '192.168.5.107'
+username = 'face'
+password = 'faceid'
+
+data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
 
 def cadastraRosto():
     sg.theme('DarkBlack')
@@ -26,47 +32,41 @@ def cadastraRosto():
     elif e == 'Seguir':
         window.close()
 
-    faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
-
     webcam = cv2.VideoCapture(0)
+    try:
+        while True:
+            _, img = webcam.read()
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            
+            faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25))                                  
 
-    while True:
-        _, img = webcam.read()
+            for (x, y, w, h) in faces:
+                cv2.rectangle(gray_img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+                contador = str(faces.shape[0])
+                if contador > '1':
+                    sg.popup_auto_close('Mais de um rosto detectado')
 
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img = imutils.resize(gray_img, width=850)
+            cv2.imshow("Verificando face, aguardando retorno...", gray_img) 
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        webcam.release()
         
-        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=8, minSize=(25, 25))                                  
+        imgName = "banco/" + nome + ".jpg"
+        cv2.imwrite(imgName, gray_img)
+        sg.popup_auto_close('Cadastro realizado com sucesso')
+        with sf.Connection(address, username=username, password=password) as sftp:
+            with sftp.cd('/home/face/face_id/cadastro'):             
+                sftp.put(imgName) 
+                
+    except Exception as error:
+        error = str(error)
+        with open('log/log.dat', 'a') as file:
+            file.write(data + '\n' + error + '\n\n------------------------------------------------------------------------\n\n')
+        sg.popup_auto_close('Algo deu errado, verifique o log')
 
-        for (x, y, w, h) in faces:
-            cv2.rectangle(gray_img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-            contador = str(faces.shape[0])
-            if contador > '1':
-                sg.popup_auto_close('Mais de um rosto detectado')
-
-        img = imutils.resize(gray_img, width=850)
-        cv2.imshow("Verificando face, aguardando retorno...", gray_img) 
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    webcam.release()
-    
-    imgName = "banco/" + nome + ".jpg"
-    cv2.imwrite(imgName, gray_img)
-    sg.popup_auto_close('Cadastro realizado com sucesso')
-
-    image = open("banco/"+ nome +".jpg", "rb")
-    img = image.read()
-    img_byte = bytearray(img)
-    img_code = base64.b64encode(img_byte)
-    con = PgSQL.connect(host='localhost',
-                        database='postgres',
-                        user='postgres',
-                        password='faceid1234')
-    cursor = con.cursor()
-    cursor.execute('INSERT INTO usuarios (nome, imagem_rosto) VALUES (%s,%s);', (nome, img_code))
-    con.commit()   
-     
     cv2.destroyAllWindows()
     main()
 cadastraRosto()
