@@ -17,12 +17,11 @@ dense_facial_landmarks=""
 face_attributes=""
 beauty_score_and_emotion_recognition=""
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
-data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 #servidor
-address = '192.168.5.107'
-username = 'root'
-password = 'faceid123'
+address = '192.168.5.108'
+username = 'face'
+password = 'faceid'
 
 #banco
 host='localhost'
@@ -37,7 +36,7 @@ def verifica(app):
         [sg.Button('Ok')]
     ]
 
-    window = sg.Window('Menu', dados, element_justification='c')
+    window = sg.Window('Identificação', dados, element_justification='c')
     e, v = window.read()
     nome = v['nome']
 
@@ -56,29 +55,22 @@ def verifica(app):
         window.close()
 
     try:
-        remotepath = nome + '.jpg'
-        localpath = 'banco/' + nome + '.jpg'
-        with sf.Connection(address, username=username, password=password) as sftp:
-            with sftp.cd('/home/face/face_id/cadastro'):
-                sftp.get(remotepath, localpath)
-
         img1 = "banco/" + nome + ".jpg"
         test = open(img1)
         test.close()
-
         webcam = cv2.VideoCapture(0)
         _, img = webcam.read()
-        
-        local = 'verifica'
-        cv2.imwrite('verifica/' + local + '.jpg', img)
+        verifica = 'verifica'
+        data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        cv2.imwrite('verifica/'+ verifica +'.jpg', img) 
 
-        img2 = "verifica/"+ local +".jpg"
+        img2 = "verifica/"+ verifica +".jpg"
         cmp_ = app.compare.get(image_file1=img1,image_file2=img2)
         confidence = cmp_.confidence
 
         if confidence > 80:
             result = True
-            
+                
         else:
             result = False
 
@@ -89,13 +81,7 @@ def verifica(app):
         cursor = con.cursor()
         cursor.execute('INSERT INTO acessos (colaborador_nome, data, acesso_autorizado) VALUES (%s,%s,%s);', (nome, data, result))
         con.commit()
-
-        with sf.Connection(address, username=username, password=password) as sftp:
-            with sftp.cd('/home/face/face_id/tentativas'):             
-                sftp.put('verifica/' + local + '.jpg')
-
-        os.remove(img1)
-
+        
     except FileNotFoundError as error:
         result = False
         error = str(error)
@@ -112,14 +98,15 @@ def verifica(app):
         main()
         os._exit(0) 
 
-    #except Exception as error:
-    #    sg.popup_ok('Algo deu errado, verifique o log')
-    #    error = str(error)
-    #    with open('log/log.dat', 'a') as file:
-    #        file.write(data + '\n' + error + '\n\n------------------------------------------------------------------------\n\n')
-    #    main()
-    #    os._exit(0)
+    except Exception as error:
+        sg.popup_ok('Algo deu errado, verifique o log')
+        error = str(error)
+        with open('log/log.dat', 'a') as file:
+            file.write(data + '\n' + error + '\n\n------------------------------------------------------------------------\n\n')
+        main()
+        os._exit(0) 
 
+    faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
     while True:
         img = cv2.imread(img2)
         img = imutils.resize(img, width=950)
