@@ -7,9 +7,9 @@ import PySimpleGUI as sg
 from datetime import datetime
 
 #servidor
-address = '192.168.5.107'
-username = 'face'
-password = 'faceid'
+address = 'IP'
+username = 'user'
+password = 'pass'
 
 data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
