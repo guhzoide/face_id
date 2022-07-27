@@ -2,7 +2,6 @@ opencv-python
 python-facepp
 PySimpleGUI
 pysftp
-imutils
-pysftp
-psycopg2
 tk
+imutils
+psycopg2-binary

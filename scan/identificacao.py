@@ -3,6 +3,7 @@ import cv2
 import imutils
 import pysftp as sf
 from menu import main
+from put_image import put
 import PySimpleGUI as sg
 import psycopg2 as PgSQL
 from datetime import datetime
@@ -17,17 +18,13 @@ dense_facial_landmarks=""
 face_attributes=""
 beauty_score_and_emotion_recognition=""
 faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
-
-#servidor
-address = '192.168.5.108'
-username = 'face'
-password = 'faceid'
+data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 #banco
 host='localhost'
 database='postgres'
 user='postgres'
-password='admin'
+password='faceid'
 
 def verifica(app):
     sg.theme('DarkBlack')
@@ -36,7 +33,7 @@ def verifica(app):
         [sg.Button('Ok')]
     ]
 
-    window = sg.Window('Identificação', dados, element_justification='c')
+    window = sg.Window('Menu', dados, element_justification='c')
     e, v = window.read()
     nome = v['nome']
 
@@ -58,30 +55,35 @@ def verifica(app):
         img1 = "banco/" + nome + ".jpg"
         test = open(img1)
         test.close()
+
         webcam = cv2.VideoCapture(0)
         _, img = webcam.read()
-        verifica = 'verifica'
-        data = (datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        cv2.imwrite('verifica/'+ verifica +'.jpg', img) 
+        webcam.release()
 
+        verifica = str(datetime.now())
+        with open('verifica/nomes.dat', 'w') as file:
+            file.write(verifica + '.jpg')
+
+        cv2.imwrite('verifica/'+ verifica +'.jpg', img) 
         img2 = "verifica/"+ verifica +".jpg"
+
         cmp_ = app.compare.get(image_file1=img1,image_file2=img2)
         confidence = cmp_.confidence
-
         if confidence > 80:
             result = True
-                
+            
         else:
             result = False
 
+        put()
         con = PgSQL.connect(host=host,
                             database=database,
                             user=user,
                             password=password)
         cursor = con.cursor()
         cursor.execute('INSERT INTO acessos (colaborador_nome, data, acesso_autorizado) VALUES (%s,%s,%s);', (nome, data, result))
-        con.commit()
-        
+        con.commit() 
+
     except FileNotFoundError as error:
         result = False
         error = str(error)
@@ -92,12 +94,13 @@ def verifica(app):
         cursor = con.cursor()
         cursor.execute('INSERT INTO acessos (colaborador_nome, data, acesso_autorizado) VALUES (%s,%s,%s);', (nome, data, result))
         con.commit()
+
         with open('log/log.dat', 'a') as file:
             file.write(data + '\n' + error + '\n\n------------------------------------------------------------------------\n\n')
         sg.popup_ok('Cadastro não encontrado')
         main()
         os._exit(0) 
-
+ 
     except Exception as error:
         sg.popup_ok('Algo deu errado, verifique o log')
         error = str(error)
@@ -106,7 +109,6 @@ def verifica(app):
         main()
         os._exit(0) 
 
-    faceCascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
     while True:
         img = cv2.imread(img2)
         img = imutils.resize(img, width=950)
@@ -131,6 +133,7 @@ def verifica(app):
             sg.popup_ok('Acesso negado')
             cv2.destroyAllWindows()
             break
+    os.remove(img2)
     main()
 
 if __name__ == '__main__':
@@ -154,6 +157,7 @@ if __name__ == '__main__':
 
     except exceptions.BaseFacePPError as e:
         sg.popup_ok('Erro ao realizar identificação')
+        print(e)
         verifica(app_)
         os._exit(0)
 

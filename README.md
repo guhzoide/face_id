@@ -1,7 +1,6 @@
 # FACE_ID
 
 #------------------------------------------------------------------------------------------------------------------------------#
-
 	Autor:		Hugo Ferreira                                                       
 	git-hub:	github.com/guhzoide                                                     
 
@@ -16,5 +15,10 @@
 	Atualização = 19/04/2022:
 		Adcionado o tratamento de multiplas faces impedindo de realizar a verificação/liberação 
 		caso ouver mais de uma. 
-		
+
+	Atualização = 17/06/2022:
+		conexão com servidor para salvar as imagens de cadastros e tentativas de acesso.
+
+	Atualização = 27/07/2022:
+		Opção de atualizar o banco de castro local.
 #------------------------------------------------------------------------------------------------------------------------------#
