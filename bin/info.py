@@ -7,10 +7,10 @@ try:
     theme = 'SystemDefault'
     #--------------------------------------#
     #banco
-    database = 'faceid'
-    user = '37iwgyvd3z2t5axm9ilh'
-    host = 'aws.connect.psdb.cloud'
-    password = 'pscale_pw_KsIB7Pj35TEBrOMUetPFVpzYMLddcQABU8AoauUU8wC'
+    database = 'database'
+    user = 'user'
+    host = 'host'
+    password = 'pass'
     #--------------------------------------#    
     #Arduino
     conn = mysql.connector.connect(host=host, user=user, password=password, database = database)
