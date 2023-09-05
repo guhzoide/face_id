@@ -1,0 +1,13 @@
+opencv-python
+python-facepp
+PySimpleGUI
+pysftp
+tk
+imutils
+psycopg2-binary
+Pillow
+qrcode
+qrdecode
+pyzbar
+kivymd
+kivy

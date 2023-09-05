@@ -1,0 +1,252 @@
+<Menu@MDFloatLayout>:
+    name: 'Menu'
+    Image:
+        source: 'lib/fundo.jpg'
+    MDFloatLayout:
+        pos_hint: {"center_x":0.35, "center_y":0.5}
+        Label:
+            text: 'Bem-vindo(a) ao identificador'
+            font_size: '30'
+            color: 255, 255, 255
+            pos_hint: {"center_x":0.35, "center_y":0.85}
+
+        Image:
+            source: 'lib/logo.png'
+            pos_hint: {"center_x":0.35, "center_y":0.50}
+
+    MDFloatLayout:
+        pos_hint: {"center_x":0.4, "center_y":0.5}
+        Label:
+            text: 'O que deseja fazer ?'
+            font_size: '30'
+            color: 255, 255, 255
+            pos_hint: {"center_x":0.8, "center_y":0.85}
+
+        MDFillRoundFlatButton:
+            text: 'Identificação'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.6, "center_y":0.6}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release: app.ident()
+
+        MDFillRoundFlatButton:
+            text: 'Cadastro'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.6, "center_y":0.35}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release: root.manager.current = 'Cadastro'
+
+        MDFillRoundFlatButton:
+            text: 'Lista de tentativas'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.95, "center_y":0.6}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release: app.lista_img()
+
+        MDFillRoundFlatButton:
+            text: 'Atualizar banco local'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.95, "center_y":0.35}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release:  app.atualiza()
+
+            
+<Cadastro@MDFloatLayout>
+    name: 'Cadastro'
+    Image:
+        source: 'lib/fundo.jpg'
+
+    MDFloatLayout:
+        pos_hint: {"center_x":0.35, "center_y":0.5}
+        Image: 
+            source: 'lib/cad.png'
+            pos_hint: {"center_x":0.4, "center_y":0.50}
+
+    MDFloatLayout:
+        pos_hint: {"center_x":0.4, "center_y":0.4}
+        MDFillRoundFlatButton:
+            text: 'Novo cadastro'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.8, "center_y":0.8}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release: root.manager.current = 'Dados'
+
+        MDFillRoundFlatButton:
+            text: 'Cadastro manual'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.8, "center_y":0.6}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release: root.manager.current = 'DadosManual'
+
+        MDFillRoundFlatButton:
+            text: 'Voltar'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.8, "center_y":0.4}
+            size_hint: .25, .060
+            md_bg_color: "#120357"
+            on_release: root.manager.current = 'Menu'
+
+<Dados@MDFloatLayout>
+    name: 'Dados'
+    MDFloatLayout:
+        pos_hint: {"center_x":0.3, "center_y":0.6}
+        MDTextField:
+            id: nome
+            hint_text: 'Nome completo'
+            size_hint_x: 0.4
+            font_size: '25'
+            md_bg_color: "#120357"
+            pos_hint: {"center_x":0.5, "center_y":0.8}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+
+        MDTextField:
+            id: chapa
+            hint_text: 'Chapa do funcionário'
+            size_hint_x: 0.4
+            font_size: '25'
+            pos_hint: {"center_x":0.5, "center_y":0.6}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+
+        MDTextField:
+            id: cpf
+            hint_text: 'CPF'
+            size_hint_x: 0.4
+            font_size: '25'
+            pos_hint: {"center_x":0.5, "center_y":0.4}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+
+        MDTextField:
+            id: email
+            hint_text: 'E-mail'
+            size_hint_x: 0.4
+            font_size: '25'
+            pos_hint: {"center_x":0.5, "center_y":0.2}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+        
+        Spinner:
+            id: nivel
+            pos_hint: {"center_x":0.5, "center_y":0.001}
+            size_hint_x: 0.4
+            size_hint_y: 0.1
+            font_size: '25'
+            text: 'Selecione o nível de acesso'
+            values: ['1', '2', '3']
+
+    MDFloatLayout:
+        pos_hint: {"center_x":0.8, "center_y":0.7}
+        MDFillRoundFlatButton:
+            text: 'Salvar'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.5, "center_y":0.4}
+            size_hint: .25, .060
+            #md_bg_color: "#120357"
+            md_bg_color: "#4bc0fa"
+            on_press: root.salvarCamera()
+            on_release: root.manager.current = 'Menu'
+
+        MDFillRoundFlatButton:
+            text: 'Voltar'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.5, "center_y":0.2}
+            size_hint: .25, .060
+            md_bg_color: "#4bc0fa"
+            on_release: root.manager.current = 'Cadastro'
+
+<DadosManual@MDFloatLayout>
+    name: 'DadosManual'    
+    MDFloatLayout:
+        pos_hint: {"center_x":0.3, "center_y":0.6}
+        MDTextField:
+            id: nome
+            hint_text: 'Nome completo'
+            size_hint_x: 0.4
+            font_size: '25'
+            md_bg_color: "#120357"
+            pos_hint: {"center_x":0.5, "center_y":0.8}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+
+        MDTextField:
+            id: chapa
+            hint_text: 'Chapa do funcionário'
+            size_hint_x: 0.4
+            font_size: '25'
+            pos_hint: {"center_x":0.5, "center_y":0.6}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+
+        MDTextField:
+            id: cpf
+            hint_text: 'CPF'
+            size_hint_x: 0.4
+            font_size: '25'
+            pos_hint: {"center_x":0.5, "center_y":0.4}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+
+        MDTextField:
+            id: email
+            hint_text: 'E-mail'
+            size_hint_x: 0.4
+            font_size: '25'
+            pos_hint: {"center_x":0.5, "center_y":0.2}
+            mode: 'rectangle'
+            multiline:False
+            write_tab:False
+        
+        Spinner:
+            id: nivel
+            pos_hint: {"center_x":0.5, "center_y":0.001}
+            size_hint_x: 0.4
+            size_hint_y: 0.1
+            font_size: '25'
+            text: 'Selecione o nível de acesso'
+            values: ['1', '2', '3']
+
+    MDFloatLayout:
+        pos_hint: {"center_x":0.8, "center_y":0.7}
+        MDFillRoundFlatButton:
+            text: 'Salvar'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.5, "center_y":0.4}
+            size_hint: .25, .060
+            #md_bg_color: "#120357"
+            md_bg_color: "#4bc0fa"
+            on_press: root.salvarManual()
+            on_release: root.manager.current = 'Menu'
+
+        MDFillRoundFlatButton:
+            text: 'Voltar'
+            font_size: '30'
+            color: 255, 255, 255,
+            pos_hint: {"center_x":0.5, "center_y":0.2}
+            size_hint: .25, .060
+            md_bg_color: "#4bc0fa"
+            on_release: root.manager.current = 'Cadastro'
