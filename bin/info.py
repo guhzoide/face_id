@@ -10,7 +10,6 @@ try:
     database = 'database'
     user = 'user'
     host = 'host'
-    
     password = 'pass'
     #--------------------------------------#    
     #Arduino
